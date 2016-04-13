@@ -8,18 +8,19 @@
 #include <iostream>
 #include "MySqrt.h"
 #include <math.h>
-#include "findMedianSortedArrays.h"
-#include "myfindMedianSortedArrays.h"
+//#include "findMedianSortedArrays.h"
+//#include "myfindMedianSortedArrays.h"
+//#include "longestConsecutive.h"
+//#include "threeSum.h"
+//#include "threesumclosest.h"
+#include "nextPermutation.h"
 #include <vector>
 using namespace std;
 
 int main(){
-	vector<int> vit1 = {1,2,3,4};
-	vector<int> vit2 = {1,2,3,4};
+	vector<int> vit1 = {1,3,3,2,1};
 	Solution s;
-	mySolution mys;
-	cout<<s.findMedianSortedArrays(vit1,vit2)<<endl;
-	cout<<mys.myfindMedianSortedArrays(vit1,vit2)<<endl;
+	s.nextPermutation(vit1);
 	return 0;
 }
 /*class Solution {
