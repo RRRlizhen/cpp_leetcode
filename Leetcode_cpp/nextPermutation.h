@@ -27,13 +27,23 @@ public:
     	if(length<2) return;
     	auto i = last-1;
     	auto j = nums.begin();
-    	while(i>nums.begin() && *(i-1)>*(i)){
+    	while(i>nums.begin() && *(i-1)>=*(i)){
     		i--;
-    	}//跳出循环的时候，(i-1)=partionNumbers
+    	}//跳出循环的时候，i-1 = partionNumbers
+
+    	if(i==nums.begin()){
+    		reverse(i,nums.end());
+    		    	for(auto re:nums){
+    		    		cout<<re<<" ";
+    		    	}cout<<endl;
+    		    	return;
+    	}
     	i--;
-    	for(auto k = nums.begin();k>i;k--){
-    		if(*k>*i){
+    	cout<<"partionNumbers= "<<*i<<endl;
+    	for(auto k = nums.end()-1;k>i;k--){
+    		if(*k > *i){
     			j = k;
+    			cout<<"chanage_numbers= "<<*j<<endl;
     			break;
     		}
     	}//找到change_numbers
@@ -44,7 +54,7 @@ public:
     	*j = temp;
 
     	//反转
-    	reverse(i,nums.end());
+    	reverse(i+1,nums.end());
     	for(auto re:nums){
     		cout<<re<<" ";
     	}cout<<endl;
