@@ -6,7 +6,7 @@
  */
 
 #include <iostream>
-#include "MySqrt.h"
+//#include "MySqrt.h"
 #include <math.h>
 //#include "findMedianSortedArrays.h"
 //#include "myfindMedianSortedArrays.h"
@@ -22,22 +22,17 @@
 //#include "preorderT.h"
 //#include "findMinpathsum.h"
 //#include "TreeTrans01.h"
-#include "triangle.h"
+//#include "triangle.h"
+//#include "canJump.h"
+//#include "canJump2.h"
+//#include "maxSubArray.h"
+#include "maxProduct.h"
 using namespace std;
 
 int main() {
-	vector<vector<int>> vvit = { { 2 }, { 3, 4 }, { 6, 5, 7 }, { 4, 1, 8, 3 } };
 	Solution s;
-	for (auto i : vvit) {
-		for (auto j : i) {
-			cout << j << " ";
-		}
-		cout << endl;
-	}
-	cout << endl;
-	int m = s.minimumTotal(vvit);
-	cout << "-----" << m << endl;
-
+	vector<int> nums = {2,3,-2,4};
+	cout<<s.maxProduct(nums)<<endl;
 	return 0;
 }
 
