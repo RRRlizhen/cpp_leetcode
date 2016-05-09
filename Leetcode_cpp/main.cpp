@@ -26,13 +26,21 @@
 //#include "canJump.h"
 //#include "canJump2.h"
 //#include "maxSubArray.h"
-#include "maxProduct.h"
+//#include "maxProduct.h"
+//#include "find_matrix.h"
+#include <typeinfo>
+#include <exception>
+#include <stdexcept>
+#include<string.h>
+#include<sstream>
+#include<stdio.h>
+//#include "../sort.h"
+#include "getLeastNumber.h"
+#include<set>
 using namespace std;
-
 int main() {
-	Solution s;
-	vector<int> nums = {2,3,-2,4};
-	cout<<s.maxProduct(nums)<<endl;
-	return 0;
+    Offer s;
+    int data[] ={1,-2,3,10,-4,7,2,-5};
+    cout<<s.findGreatestSumOfSubArray(data,sizeof(data)/sizeof(data[0]));
+    return 0;
 }
-

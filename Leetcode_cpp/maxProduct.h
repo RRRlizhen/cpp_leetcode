@@ -13,7 +13,7 @@ public:
     int maxProduct(vector<int> &nums){
         int length = nums.size();
         vector<int> f(length);
-        f
+
     }
 };
 
