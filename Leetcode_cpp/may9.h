@@ -10,6 +10,8 @@
 #include<limits.h>
 #include<deque>
 #include<stack>
+#include<numeric>
+#include<sstream>
 using namespace std;
 
 class MyMapTest{
@@ -112,6 +114,15 @@ struct ListNode {
     int val;
     ListNode *next;
     ListNode(int x) : val(x), next(NULL) {}
+};
+
+struct TreeLinkNode{
+    int val;
+    TreeLinkNode *right;
+    TreeLinkNode *left;
+    TreeLinkNode *next;
+
+    TreeLinkNode (int val):val(val),right(nullptr),left(nullptr),next(nullptr){}
 };
 
 class Queue {
@@ -462,29 +473,228 @@ public:
     }
 
     ///
-
-    helpBuildTreePreIn(vector<int>::iterator &sPre,vector<int>::iterator &ePre,
-                        vector<int>::iterator &sIn,vector<int>::iterator &eIn)
-    {
-        int rootVale = *sPre;
-        TreeNode *root = new TreeNode();
-        root->val = rootVale;
-        root->left = root->right = nullptr;
-
-        if(sPre==ePre){
-            if(sIn==eIn && *sPre==*sIn){
-                return root;
+    bool isValidBST(TreeNode* root) {
+        vector<int> result;
+        stack<TreeNode*> s;
+        TreeNode *p = root;
+        bool iSfirst = true;
+        int tmp = 0;
+        while(!s.empty()||p!=nullptr){
+            if(p!=nullptr){
+                s.push(p);
+                p = p->left;
+            }else{
+                p = s.top();
+                s.pop();
+                //result.push_back(p->val);
+                if(iSfirst){
+                    tmp = p->val;
+                    iSfirst = false;
+                }else if(tmp>=p->val){
+                    return false;
+                }else{
+                    tmp = p->val;
+                }
+                p = p->right;
             }
-        }///if
-
-        int
-    }
-
-    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
-        if(preorder == nullptr || inorder==nullptr || preorder.size()!=inorder.size()) return nullptr;
-        return helpBuildTreePreIn(preorder.begin(),preorder.empty()--,inorder.begin(),inorder.end()--);
+        }
+        return true;
     }///
 
+
+    ///
+    void help_sumNumbers(TreeNode *root,int &ret,vector<int> store){
+        if(root==nullptr) return;
+        store.push_back(root->val);
+        if(root->left==nullptr && root->right==nullptr){
+
+            int length = store.size();
+            int tmp = 0;
+            for(int i = 0;i<length;i++){
+                tmp += pow(10,length-i-1)*store[i];
+            }
+            //cout<<"tmp"<<tmp<<endl;
+            ret += tmp;
+        }
+        help_sumNumbers(root->left,ret,store);
+        help_sumNumbers(root->right,ret,store);
+    }
+    int sumNumbers(TreeNode* root) {
+        int ret = 0;
+        vector<int> store;
+        if(root==nullptr) return 0;
+        help_sumNumbers(root,ret,store);
+        return ret;
+    }
+
+
+    ///
+    void help_pathSum(TreeNode* root,vector<vector<int>> &ret,const int sum,vector<int> tmp){
+        if(root==nullptr) return;
+        tmp.push_back(root->val);
+        if(root->left==nullptr && root->right==nullptr){
+            int v = std::accumulate(tmp.begin(),tmp.end(),0);
+            if(sum == v){
+                ret.push_back(tmp);
+                //cout<<sum<<endl;
+            }
+        }
+        help_pathSum(root->left,ret,sum,tmp);
+        help_pathSum(root->right,ret,sum,tmp);
+    }
+    vector<vector<int>> pathSum(TreeNode* root, int sum) {
+        vector<vector<int>> ret;
+        if(root==nullptr) return ret;
+        vector<int> tmp;
+        help_pathSum(root,ret,sum,tmp);
+        return ret;
+    }
+
+
+    ///
+    bool isHave = false;
+    void help_hasPathSum(TreeNode* root,const int sum,vector<int> tmp){
+        if(root==nullptr) return;
+        tmp.push_back(root->val);
+        if(root->left==nullptr && root->right==nullptr){
+            int v = std::accumulate(tmp.begin(),tmp.end(),0);
+            if(sum == v){
+                isHave = true;
+                //cout<<sum<<endl;
+            }
+        }
+        help_hasPathSum(root->left,sum,tmp);
+        help_hasPathSum(root->right,sum,tmp);
+    }
+
+    bool hasPathSum(TreeNode* root, int sum) {
+        if(root==nullptr) return false;
+        vector<int> tmp;
+        help_hasPathSum(root,sum,tmp);
+        return isHave;
+    }
+
+    ///
+    void connect_1(TreeLinkNode *root) {
+        if(root==nullptr) return;
+        TreeLinkNode dummay(-1);
+
+        for(TreeLinkNode *curr = root, *pre = &dummay;
+            curr;
+            curr = curr->next){
+            if(curr->left != nullptr){
+                pre->next = curr->left;
+                pre = pre->next;
+            }
+            if(curr->right != nullptr){
+                pre->next = curr->right;
+                pre = pre->next;
+            }
+        }
+        connect(dummay.next);
+    }
+
+    ///
+    void connect_2(TreeLinkNode *root){
+        if(root==nullptr) return;
+        while(root){
+            TreeLinkNode *next = nullptr;/// the first ndoe of next level
+            TreeLinkNode *pre = nullptr;///previous node on the same level
+            for(;root;root = root->next){
+                if(next==nullptr) next = root->left? root->left: root->right;
+
+                if(root->left){
+                    if(pre) pre->next = root->left;
+                    pre = root->left;
+                }
+
+                if(root->right){
+                    if(pre) pre->next = root->right;
+                    pre = root->right;
+                }
+            }///for
+            root = next;
+        }
+    }///connect-end
+
+    void connect(TreeLinkNode *root){
+        while(root){
+            TreeLinkNode *next = nullptr;///the start node of the next level
+            TreeLinkNode *prev = nullptr;/// the previous node of the same level
+            for(;root;root = root->next){
+                if(next==nullptr) next = root->left? root->left:root->right;
+
+                if(root->left){
+                    if(prev) prev->next = root->left;
+                    prev = root->left;
+                }
+
+                if(root->right){
+                    if(prev) prev->next = root->right;
+                    prev = root->right;
+                }
+            }///for
+            root = next;
+        }///while
+    }
+
+
+    ///build the tree from the inorder and prevOrder trans
+    ///
+    template<typename InputIterator>
+    TreeNode* buildTree(InputIterator pre_first,InputIterator pre_last,InputIterator in_first,InputIterator in_last){
+        if(pre_first == pre_last) return nullptr;
+        if(in_first == in_last) return nullptr;
+        auto root = new TreeNode(*pre_first);
+
+        auto inRootPos = find(in_first,in_last,*pre_first);
+        auto leftSize = distance(in_first,inRootPos);
+
+        root->left = buildTree(next(pre_first),next(pre_first,leftSize+1),in_first,next(in_first,leftSize));
+        root->right = buildTree(next(pre_first,leftSize+1),pre_last,next(inRootPos),in_last);
+        return root;
+    }
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        return buildTree(preorder.begin(),preorder.end(),inorder.begin(),inorder.end());
+    }
+
+
+    ///Unique binary search trees;
+    int numTree(int n){
+            ///f[n] = E0..n{  f[i]*f[n-i]   };
+        vector<int> f(n+1,0);
+        f[0] = 1;
+        f[1] = 1;
+        for(int i = 2;i<=n;i++){
+            for(int j = 0;j<i;j++){
+               f[i] += f[j]*f[i-j-1];
+               cout<<"f["<<i<<"]= "<<f[i]<<endl;
+            }
+        }///for
+        return f[n];
+    }
+
+    ///
+    int myAtoi(string str){
+        if(str=="") return 0;
+        int re = 0;
+        int len = str.size();
+        char *p = const_cast<char*> (str.c_str());
+        bool isNegative = false;
+        int k = str.find_first_not_of(' ');
+        if(p[k]=='-'){
+            isNegative = true;
+            k++;
+        }else if(p[k]=='+'){
+            k++;
+        }
+        for(int i = k;i<len;i++){
+            if(isdigit(p[i])){
+                re = re*10+p[i]-'0';
+            }
+        }
+        return isNegative? 0-re:re;
+    }
 };
 
 
