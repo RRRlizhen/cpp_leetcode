@@ -695,6 +695,134 @@ public:
         }
         return isNegative? 0-re:re;
     }
+
+    ///
+    string getHint(string s, string g) {
+        int cnt[10] ={0};
+        int len = s.size();
+        int bull = 0;
+        int cow = 0;
+        for(int i = 0;i<len;i++){
+            if(s[i]==g[i]){
+                bull++;
+            }
+            cnt[s[i]-'0']++;
+        }
+
+        for(int i = 0;i<len;i++){
+            if(cnt[g[i]-'0']>0){
+                cow++;
+            }
+            cnt[g[i]-'0']--;
+        }
+        cow -=bull;
+        return to_string(bull)+'A'+to_string(cow)+'B';
+    }
+
+
+    ///
+    bool wordPattern(string p, string str) {
+        unordered_map<char,int> mp;
+        unordered_map<string,int> ms;
+        istringstream in(str);
+        int i = 0;
+        for(string word;in>>word;i++){
+            cout<<word<<endl;
+            if(mp.find(p[i])!=mp.end() && ms.find(word)!=ms.end()){
+                if(mp[p[i]]!=ms[word])return false;
+                continue;
+            }else if(mp.find(p[i])!=mp.end()){
+                return false;
+            }else if(ms.find(word)!=ms.end()){
+                return false;
+            }
+            mp[p[i]] = i;
+            ms[word] = i;
+        }
+        return (unsigned int)(i)==p.size();
+    }
+
+
+    ///
+    bool isPalindrome(ListNode* head) {
+        if(!head ||  !head->next) return true;
+        ListNode *slow = head;
+        ListNode *fast = head->next;
+        ListNode *prev = nullptr;
+        while(true){
+            if(!fast->next){
+                fast = slow->next;
+                slow->next = prev;
+                break;
+            }else if(!fast->next->next){
+                fast = slow->next->next;
+                slow->next = prev;
+                break;
+            }else{
+                fast = fast->next->next;
+                ListNode *tmp = slow->next;
+                slow->next = prev;
+                prev = slow;
+                slow = tmp;
+            }///if-else/
+        }///while
+
+        while(slow && fast){
+            if(slow->val != fast->val) return false;
+            slow = slow->next;
+            fast = fast->next;
+        }
+        return true;
+    }
+
+
+    ///
+    int strStr(string h, string n) {
+        int len_h = h.size();
+        int len_n = n.size();
+        for(int i = 0;i<=len_h-len_n;i++){
+            int curr = i;
+            int j = 0;
+            while(j<len_n && h[curr]==n[j]){
+                curr++;
+                j++;
+                continue;
+            }
+            if(j==len_n) return i;
+        }
+        return -1;
+    }
+
+
+    ///m.CalcAllPermutation(const_cast<char*>(str.c_str()),0,2);
+    void CalcAllPermutation(char *perm,int from,int to){
+        if(to<=1){
+            return;
+        }
+        if(from == to){
+            for(int i = 0;i<=to;i++){
+                cout<<perm[i];
+            }cout<<endl;
+        }else{
+            for(int j = from;j<=to;j++){
+                swap(perm[j],perm[from]);
+                CalcAllPermutation(perm,from+1,to);
+                swap(perm[j],perm[from]);
+            }
+        }///if-else
+    }
+
+
+    ///
+    template<typename InputIterator>
+    void help_permute(vector<vector<int>> &re,vector<int> &nums,int from,int to){
+
+    }
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> re;
+        help_permute(re,nums,0,nums.size()-1);
+        return re;
+    }
 };
 
 
