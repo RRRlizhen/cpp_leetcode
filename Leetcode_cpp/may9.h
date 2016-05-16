@@ -814,13 +814,64 @@ public:
 
 
     ///
-    template<typename InputIterator>
+    ///
     void help_permute(vector<vector<int>> &re,vector<int> &nums,int from,int to){
-
+        if(to<=0){
+            return ;
+        }
+        if(from == to){
+            re.push_back(nums);
+            for(auto i:nums){
+                cout<<i<<" ";
+            }cout<<endl;
+        }else{
+            for(int j = from;j<=to;j++){
+                swap(nums[j],nums[from]);
+                help_permute(re,nums,from+1,to);
+                swap(nums[j],nums[from]);
+            }
+        }
     }
     vector<vector<int>> permute(vector<int>& nums) {
         vector<vector<int>> re;
+        if(nums.size()<=1){
+            re.push_back(nums);
+            for(auto i:nums){
+                cout<<i<<" ";
+            }cout<<endl;
+            return re;
+        }
         help_permute(re,nums,0,nums.size()-1);
+        return re;
+    }
+
+
+    ///
+    void help_permuteUnique(vector<vector<int>> &re,vector<int> &nums,int from,int to){
+        if(to<=0){
+            return;
+        }
+        if(from == to){
+            re.push_back(nums);
+            for(auto i:nums){
+                cout<<i<<" ";
+            }cout<<endl;
+        }else{
+            for(int j = from;from<=to;j++){
+                int k = from+1;
+                while(k<j){
+                    if(nums[k]==nums[j]) continue;
+                    k++;
+                }
+                swap(nums[j],nums[k]);
+                help_permuteUnique(re,nums,from+1,to);
+                swap(nums[j],nums[k]);
+            }
+        }
+    }
+    vector<vector<int>> permuteUnique(vector<int>& nums) {
+        vector<vector<int>> re;
+        help_permuteUnique(re,nums,0,nums.size()-1);
         return re;
     }
 };
