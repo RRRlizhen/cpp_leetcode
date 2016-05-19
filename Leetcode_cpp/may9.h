@@ -12,6 +12,7 @@
 #include<stack>
 #include<numeric>
 #include<sstream>
+#include<list>
 using namespace std;
 
 class MyMapTest{
@@ -796,7 +797,7 @@ public:
 
     ///m.CalcAllPermutation(const_cast<char*>(str.c_str()),0,2);
     void CalcAllPermutation(char *perm,int from,int to){
-        if(to<=1){
+        if(to<=0){
             return;
         }
         if(from == to){
@@ -813,7 +814,6 @@ public:
     }
 
 
-    ///
     ///
     void help_permute(vector<vector<int>> &re,vector<int> &nums,int from,int to){
         if(to<=0){
@@ -874,8 +874,32 @@ public:
         help_permuteUnique(re,nums,0,nums.size()-1);
         return re;
     }
-	///
-	//
+
+    ///
+    list<int> list1;
+    void SumOfKnumber(int sum,int n){
+        ///recurise exit
+        if(n<=0 || sum<=0){
+            return;
+        }
+
+        ///find the solution
+        if(sum == n){
+            ///reverse
+            list1.reverse();
+            for(list<int>::iterator iter = list1.begin();
+                iter!=list1.end();iter++){
+                cout<<*iter<<" + ";
+            }cout<<n<<"="<<endl;
+            list1.reverse();
+        }///if
+
+        list1.push_front(n);
+        SumOfKnumber(sum-n,n-1);
+
+        list1.pop_front();
+        SumOfKnumber(sum,n-1);
+    }
 };
 
 
