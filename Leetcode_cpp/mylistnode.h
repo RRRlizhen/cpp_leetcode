@@ -525,6 +525,53 @@ public:
         return dummy.next;
     }
 
+
+    ///
+    vector<int> intersect(vector<int>& nums1, vector<int>& nums2) {
+        vector<int> re;
+        sort(nums1.begin(),nums1.end());
+        sort(nums2.begin(),nums2.end());
+
+        vector<int>::iterator it1 = nums1.begin();
+        vector<int>::iterator it2 = nums2.begin();
+        for(;it1!=nums1.end() && it2!=nums2.end();){
+            if(*it1<*it2) it1++;
+            else if(*it1 > *it2) it2++;
+            else{
+                re.push_back(*it1);
+                it1++;
+                it2++;
+            }
+        }
+        return re;
+    }
+
+    vector<int> intersection(vector<int>& nums1, vector<int>& nums2) {
+        vector<int> re;
+        sort(nums1.begin(),nums1.end());
+        sort(nums2.begin(),nums2.end());
+
+        vector<int>::iterator it1 = nums1.begin();
+        vector<int>::iterator it2 = nums2.begin();
+        int prev = INT_MAX;
+        for(;it1!=nums1.end() && it2!=nums2.end();){
+            if(*it1<*it2) it1++;
+            else if(*it1 > *it2) it2++;
+            else{
+                if(prev == *it1){
+                    it1++;
+                    it2++;
+                    continue;
+                }
+                prev = *it1;
+                re.push_back(*it1);
+                it1++;
+                it2++;
+            }
+        }
+        return re;
+    }
+
     void test(ListNode *head){
         cout<<"begin test...\n";
         ListNode n1(6),n2(2),n3(4),n4(3),n5(5),n6(1);
