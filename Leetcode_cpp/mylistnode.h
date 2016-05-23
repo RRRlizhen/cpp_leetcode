@@ -14,7 +14,11 @@ public:
     ListNode *next;
     ListNode(int x): val(x),next(nullptr) {}
 };
-
+struct RandomListNode{
+        int label;
+        RandomListNode *next,*random;
+        RandomListNode(int x):label(x),next(nullptr),random(nullptr){}
+};
 class TreeNode {
     public:
     int val;
@@ -53,6 +57,12 @@ public:
             head = head->next;
         }
         cout<<endl;
+    }
+    void showList(RandomListNode *head){
+        while(head){
+            cout<<head->label<<" ";
+            head = head->next;
+        }cout<<endl;
     }
 
     ///
@@ -240,7 +250,7 @@ public:
         ListNode dummy(-1);
         ListNode *curr,*in;
         curr = head;
-        for(;curr;curr->next){
+        for(;curr;){
             in = &dummy;
             in = findLocationInsert(in,curr->val);
             ListNode *tmp = curr->next;
@@ -413,8 +423,9 @@ public:
             arr[i] = head->val;
             head = head->next;
         }
-    }///
+    }
 
+    ///
     ListNode* oddEvenList(ListNode* head) {
         if(head==nullptr || head->next==nullptr) return head;
         ListNode dummy1(-1);
@@ -438,16 +449,93 @@ public:
         return dummy2.next;
     }
 
+
+    ///
+
+    RandomListNode *copyRandomList(RandomListNode *head){
+        RandomListNode *curr = head;
+        while(curr){
+            RandomListNode *node = new RandomListNode(curr->label);
+            node->next = curr->next;
+            curr->next = node;
+            curr = node->next;
+        }///a->f_a->  b->f_b-> ...
+        curr = head;
+        while(curr){
+            if(curr->random){
+                curr->next->random = curr->random->next;
+            }
+            curr = curr->next->next;
+        }
+
+        ///partition it into two linktable
+        RandomListNode dummy(-1);
+        RandomListNode *h = &dummy;
+        curr = head;
+        while(curr){
+            h->next = curr->next;
+            curr->next = curr->next->next;
+            h = h->next;
+            curr = curr->next;
+        }
+        h->next = nullptr;
+        return dummy.next;
+    }
+
+
+    ///======
+    void help_reverseKGroup(ListNode *prev,ListNode *curr,int k){
+        ListNode *p = prev->next;
+        prev->next = curr->next;
+        for(int i = 0;i<k;i++){
+            ListNode *tmp = p->next;
+            p->next = prev->next;
+            prev->next = p;
+            p = tmp;
+        }
+    }
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        if(k<=1) return head;
+        if(head==nullptr || head->next==nullptr)return head;
+        ListNode dummy(-1);
+        dummy.next = head;
+        ListNode *curr,*prev;
+        curr = head;
+        prev = &dummy;
+        bool isbreak = false;
+
+        while(curr){
+            int i = 1;
+            for(;i<k;i++){
+                if(curr->next)  curr = curr->next;
+                else break;
+            }
+            if(i!=k) break;
+            //showList(dummy.next);cout<<"k1"<<endl;
+
+            help_reverseKGroup(prev,curr,k);
+
+            //showList(dummy.next);cout<<"k2"<<endl;
+            for(i = 0;i<k;i++){
+                prev = curr;
+                curr = curr->next;
+            }
+            //showList(head);cout<<"k3"<<endl;
+        }///while
+        return dummy.next;
+    }
+
     void test(ListNode *head){
         cout<<"begin test...\n";
         ListNode n1(6),n2(2),n3(4),n4(3),n5(5),n6(1);
         n1.next = &n2;
-        n2.next = &n3;
+        //n2.next = &n3;
         n3.next = &n4;
         n4.next = &n5;
-        n5.next = &n6;
+        //n5.next = &n6;
         ListNode *head2 = &n1;
-        head2 = oddEvenList(head2);
+        showList(head2);cout<<endl;
+        head2 = reverseKGroup(head2,3);
         showList(head2);
 
         cout<<"end test...\n";
