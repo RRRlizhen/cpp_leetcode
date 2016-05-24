@@ -6,6 +6,8 @@
 #include <limits.h>
 #include <vector>
 #include <stack>
+#include <unordered_map>
+#include <map>
 using namespace std;
 
 
@@ -709,6 +711,164 @@ public:
 
 
     ///
+    int numDecodings(string s) {
+        if(s.empty()) return 0;
+        int curr = 1;
+        return curr;
+    }
+
+
+    ///
+    void help_reverse(string &s,int start,int end){
+        while(start<end){
+            swap(s[start++],s[end--]);
+        }
+    }
+    string removeDuplicateSpace(string s){
+        string res;
+        int b = 0;
+        for(;b<(int)s.size();b++){
+            if(s[b]!= ' '){
+                break;
+            }
+        }///
+        int e = s.size() - 1;
+        for(;e>=0;e--){
+            if(s[e]!=' '){
+                break;
+            }
+        }
+
+        bool is_space = false;
+        for(int i = b;i<=e;i++){
+            if(s[i] == ' '){
+                if(!is_space) is_space = true;
+                else continue;
+            }else{
+                is_space = false;
+            }
+            res.push_back(s[i]);
+        }
+        return res;
+    }
+    void reverseWords(string &s) {
+        if(s.empty()) return;
+        s = removeDuplicateSpace(s);
+        int start = 0;
+        for(size_t i = 0;i<s.size();i++){
+            if(s[i]!=' '){
+                start = i;
+            }else{
+                continue;
+            }
+            size_t j = i;
+            while(j<s.size() && s[j]!=' '){
+                j++;
+            }
+            j--;
+            help_reverse(s,start,j);
+            i = j++;
+        }
+        help_reverse(s,0,(int)s.size()-1);
+    }
+
+    ///
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        vector<vector<string>> re;
+        if(strs.empty()) return re;
+        unordered_map<string,int> m;
+        int k = 0;
+        for(size_t i = 0;i<strs.size();i++){
+            string tmp = strs[i];
+            sort(tmp.begin(),tmp.end());
+            unordered_map<string,int>::iterator mit = m.find(tmp);
+            if(mit == m.end()){
+                vector<string> t;
+                t.push_back(strs[i]);
+                m[tmp] = k++;
+                re.push_back(t);
+            }else{
+                re[m[tmp]].push_back(strs[i]);
+            }
+        }///for
+        for(size_t i = 0;i<re.size();i++){
+            sort(re[i].begin(),re[i].end());
+        }
+
+        for(auto i:re){
+            for(auto j:i){
+                cout<<j<<" ";
+            }cout<<endl;
+        }cout<<endl;
+        return re;
+    }
+
+
+    ///
+    void myslipt(string &s,vector<string> &re,string &c){
+        std::string::size_type pos1,pos2;
+        pos2 = s.find(c);///find
+        pos1 = 0;
+        while(std::string::npos != pos2){
+            string t = s.substr(pos1,pos2-pos1);///[p1,p2)
+            if(!t.empty()){
+                re.push_back(t);
+            }
+            pos1 = pos2+c.size();
+            pos2 = s.find(c,pos1);
+        }
+        if(pos1!=s.length()){
+            re.push_back(s.substr(pos1));
+        }
+    }
+
+    string simplifyPath(string path) {
+        vector<string> re;
+        string c = "/";
+        myslipt(path,re,c);
+        stack<string> st;
+        for(size_t i = 0;i<re.size();i++){
+            if(re[i]==".") continue;
+            else if(re[i]==".."){
+                if(st.empty()){
+                    continue;
+                }else{
+                    st.pop();
+                }///if-else
+            }else{
+                st.push(re[i]);
+            }
+        }
+        string result;
+        while(!st.empty()){
+            result.insert(0,st.top());
+            result.insert(0,"/");
+            st.pop();
+        }
+        return result;
+    }
+
+    ///
+    vector<int> topKFrequent(vector<int>& nums, int k) {
+        map<int,int> m;///key,multis
+        vector<int> re;
+        for(size_t i = 0;i<nums.size();i++){
+            map<int,int>::iterator mit = m.find(nums[i]);
+            if(mit==m.end()){
+                m[nums[i]] = 1;
+            }else{
+                m[nums[i]]++;
+            }
+        }
+
+        for(map<int,int>::iterator mit = m.begin();
+            mit!=m.end() && k>=1;
+            mit++,k--){
+            re.push_back(mit->second);
+        }
+        return re;
+    }
+
 
     void test(ListNode *head){
         cout<<"begin test...\n";
@@ -720,14 +880,13 @@ public:
         //n5.next = &n6;
         ListNode *head2 = &n1;
         showList(head2);cout<<endl;
-        string str = "1-2+3";
-        int a = calculate(str);
-        cout<<a<<endl;
+        vector<int> re = {1,1,1,2,2,3};
+        re = topKFrequent(re,2);
+        for(auto i: re){
+            cout<<i<<" ";
+        }cout<<endl;
 
         cout<<"end test...\n";
     }
-
 };
-
-
 #endif // MYLISTNODE_H_INCLUDED
