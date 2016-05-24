@@ -4,6 +4,8 @@
 #include <climits>
 #include <stdlib.h>
 #include <limits.h>
+#include <vector>
+#include <stack>
 using namespace std;
 
 
@@ -502,7 +504,6 @@ public:
         ListNode *curr,*prev;
         curr = head;
         prev = &dummy;
-        bool isbreak = false;
 
         while(curr){
             int i = 1;
@@ -572,6 +573,143 @@ public:
         return re;
     }
 
+
+    ///
+    string longestCommonPrefix(vector<string>& strs) {
+        string re;
+        if(strs.empty()) return re;
+        for(int i = 0;i<(int)strs[0].size();i++){
+            for(int j = 0;j<(int)strs.size();j++){
+                if(i>=(int)strs[j].size()) return re;
+                if(strs[j][i]==strs[0][i])
+                    continue;
+                else
+                    return re;
+            }
+            re.push_back(strs[0][i]);
+        }
+        return re;
+    }
+
+
+    void showStack(stack<char> &s){
+        while(s.empty()){
+            cout<<s.top()<<" ";
+            s.pop();
+        }
+    }
+    ///
+    bool isValid(string s) {
+        stack<char> stac;
+        if(s.empty()) return true;
+        for(int i = 0;i<(int)s.size();i++){
+            if(stac.empty()){
+                stac.push(s[i]);
+                continue;
+            }
+
+            if('['==stac.top() && ']'==s[i])
+                stac.pop();
+            else if('{'==stac.top() && '}'==s[i])
+                stac.pop();
+            else if('('==stac.top() && ')'==s[i])
+                stac.pop();
+            else
+                stac.push(s[i]);
+        }
+        return stac.empty()? true:false;
+    }
+
+    int myAtoi(string str) {
+        int num = 0;
+        int sign = 1;
+        const int n = str.length();
+        int i = 0;
+        while(i<n && str[i]==' ') i++;
+
+        if(str[i] == '+'){
+            i++;
+        }else if(str[i]=='-'){
+            sign = -1;
+            i++;
+        }
+        for(;i<n;i++){
+            if(!isdigit(str[i])) break;
+            if(num > INT_MAX/10 ||
+                (num==INT_MAX/10 && (str[i]-'0')>INT_MAX%10)){
+                return sign==-1? INT_MIN:INT_MAX;
+            }
+            num = num*10+str[i]-'0';
+        }
+        return num*sign;
+    }
+
+    ///
+    int calculate(string s){
+        stack<char> op;
+        stack<int> num;
+        const int n = s.size();
+        char ch;
+        int tmp = 0;
+        int a = 0;
+        for(int i = 0;i<n;i++){
+            ch = s[i];
+            if(ch==' ') continue;
+            else if(ch=='*' || ch=='/' || ch=='+' || ch=='-'){
+                op.push(ch);
+            }else if(isdigit(ch)){
+                tmp = tmp*10+ch-'0';
+                while(i<n && isdigit(ch=s[++i])){
+                    tmp = tmp*10+ch-'0';
+                }
+                if(!op.empty()){
+                    char curr_op = op.top();
+                    if(curr_op == '*'){
+                        int a = num.top();num.pop();op.pop();
+                        num.push(a*tmp);
+                    }else if(curr_op == '/'){
+                        a = num.top();num.pop();op.pop();
+                        num.push(a/tmp);
+                    }else{
+                        if(curr_op == '-') tmp *=-1;
+                        num.push(tmp);
+                    }
+                }else{
+                    num.push(tmp);
+                }
+                tmp = 0;
+                if(i==n) break;
+                i--;
+            }
+        }
+
+        while(!op.empty()){
+            int a = num.top();num.pop();
+            int b = num.top();num.pop();
+            //char ch = op.top();
+            op.pop();
+            num.push(a+b);
+        }///while
+        int re = num.top();num.pop();
+        return re;
+    }
+
+
+    ///
+    bool isAnagram(string s, string t) {
+        if(s.size() != t.size()) return false;
+        sort(s.begin(),s.end());
+        sort(t.begin(),t.end());
+        int n = s.size();
+        for(int i = 0;i<n;i++){
+            if(s[i]!=t[i]) return false;
+        }
+        return true;
+    }
+
+
+    ///
+
     void test(ListNode *head){
         cout<<"begin test...\n";
         ListNode n1(6),n2(2),n3(4),n4(3),n5(5),n6(1);
@@ -582,8 +720,9 @@ public:
         //n5.next = &n6;
         ListNode *head2 = &n1;
         showList(head2);cout<<endl;
-        head2 = reverseKGroup(head2,3);
-        showList(head2);
+        string str = "1-2+3";
+        int a = calculate(str);
+        cout<<a<<endl;
 
         cout<<"end test...\n";
     }
