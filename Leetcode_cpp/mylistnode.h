@@ -849,25 +849,43 @@ public:
     }
 
     ///
+    struct keyval{
+        int key;
+        int val;
+        keyval(int k=0,int v=0):key(k),val(v){}
+    };
+    static bool mykeyval(const keyval &l,const keyval &r){
+        return l.val>r.val;
+    }
     vector<int> topKFrequent(vector<int>& nums, int k) {
         map<int,int> m;///key,multis
         vector<int> re;
-        for(size_t i = 0;i<nums.size();i++){
-            map<int,int>::iterator mit = m.find(nums[i]);
-            if(mit==m.end()){
-                m[nums[i]] = 1;
-            }else{
-                m[nums[i]]++;
-            }
+        for(auto i: nums){
+            m[i]++;
         }
-
-        for(map<int,int>::iterator mit = m.begin();
-            mit!=m.end() && k>=1;
-            mit++,k--){
-            re.push_back(mit->second);
+        vector<keyval> tmp(m.size());
+        int d = 0;
+        for(auto i: m){
+            tmp[d].key = i.first;
+            tmp[d++].val = i.second;
+        }
+        for(auto i:m){
+            cout<<i.first<<"--"<<i.second<<" ";
+        }cout<<endl;
+        for(auto i:tmp){
+            cout<<i.key<<":"<<i.val<<" ";
+        }cout<<endl;
+        sort(tmp.begin(),tmp.end(),mykeyval);
+        cout<<"===="<<endl;
+        for(auto i:tmp){
+            cout<<i.key<<":"<<i.val<<" ";
+        }cout<<endl;
+        for(int i = 0;i<k;i++){
+            re.push_back(tmp[i].key);
         }
         return re;
     }
+
 
 
     void test(ListNode *head){
@@ -880,7 +898,7 @@ public:
         //n5.next = &n6;
         ListNode *head2 = &n1;
         showList(head2);cout<<endl;
-        vector<int> re = {1,1,1,2,2,3};
+        vector<int> re = {1,1,1,2,2,3,3,3,3,3};
         re = topKFrequent(re,2);
         for(auto i: re){
             cout<<i<<" ";
