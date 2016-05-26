@@ -16,6 +16,7 @@
 #include <stack>
 #include <unordered_map>
 #include <map>
+#include <algorithm>
 using namespace std;
 
 class ListNode
@@ -363,20 +364,134 @@ public:
         return dp[m-1][n-1];
     }
 
+    ///
+    int minCost1(string s1,string s2){
+        if(s1.empty()) return s2.size();
+        if(s2.empty()) return s1.size();
+        int m = s1.size();
+        int n = s2.size();
+        int dp[m+1][n+1];
+        memset(dp,0,sizeof(dp));
+        for(int i = 0;i<m+1;i++){
+            dp[i][0] = i;
+        }
+        for(int j = 0;j<n+1;j++){
+            dp[0][j] = j;
+        }
+
+        for(int i = 1;i<m+1;i++){
+            for(int j = 1;j<n+1;j++){
+                /**
+                    s1 yyyyd
+                    s2 xxxx
+                    ---------
+                    s1 yyyy
+                    s2 xxxxi
+                    ---------
+                    s1 yyyyr
+                    s2 xxxxr
+                    ---------
+                    s1 yyyyo
+                    s2 xxxxo
+                */
+                if(s1[i]==s2[j]){
+                    dp[i][j] = dp[i-1][j-1];
+                }else{
+                    int a1 = dp[i-1][j];
+                    int a2 = dp[i-1][j-1];
+                    int a3 =  dp[i][j-1];
+                    dp[i][j] = min(min(a1,a2),a3)+1;
+                }///if-else
+            }
+        }///
+        return dp[m][n];
+    }
 
 
     ///
+    void help_combinationSum(vector<int> &c,const int t,vector<vector<int>> &re,vector<int> &path,
+                int i){
+        ///
+
+        int sum = accumulate(path.begin(),path.end(),0);
+        if(t == sum){
+            sort(path.begin(),path.end());
+            re.push_back(path);
+            return;
+        }
+        if(t < sum){
+            return;
+        }
+
+        if(i>=c.size()) return ;
+        ///not select the c[i]
+        help_combinationSum(c,t,re,path,i+1);
+        path.push_back(c[i]);
+        help_combinationSum(c,t,re,path,i);
+        path.pop_back();
+    }
+    vector<vector<int>> combinationSum(vector<int>& c, int t) {
+        vector<vector<int>> re;
+        vector<int> path;
+        sort(c.begin(),c.end());///this is very import!!!!!
+
+        if(c.empty()) return re;
+        help_combinationSum(c,t,re,path,0);
+        for(auto i:re){
+            for(auto j:i){
+                cout<<j<<" ";
+            }cout<<endl;
+        }
+        return re;
+    }
+
+
+
+    ///
+    void help_combinationSum2(vector<int> &c,const int t,vector<vector<int>> &re,vector<int> &path,
+                    int i){
+        int sum = accumulate(path.begin(),path.end(),0);
+        if(t==sum){
+            sort(path.begin(),path.end());
+            re.push_back(path);
+        }
+
+        if(t<sum){
+            return;
+        }
+        if(i>=c.size()){
+            return;
+        }
+        ///not select c[i]
+        help_combinationSum(c,t,re,path,i+1);
+        path.push_back(c[i]);
+        help_combinationSum2(c,t,re,path,i+1);
+        path.pop_back();
+
+    }
+    vector<vector<int>> combinationSum2(vector<int>& c, int t) {
+        vector<vector<int>> re;
+        vector<int> path;
+        sort(c.begin(),c.end());
+
+        if(c.empty()) return re;
+        help_combinationSum2(c,t,re,path,0);
+        for(auto i:re){
+            for(auto j:i){
+                cout<<j<<" ";
+            }cout<<endl;
+        }
+        return re;
+    }
     void test(ListNode *head){
         cout<<"begin test...\n";
         ListNode n1(6),n2(2),n3(4),n4(3),n5(5),n6(1);
         n1.next = &n2;n2.next = &n3;n3.next = &n4;n4.next = &n5;n5.next = &n6;
         ListNode *head2 = &n1;
         showList(head2);cout<<endl;
-        vector<vector<int>> c = {
-                                {0,0,0},
-                                {0,1,0},
-                                {0,0,0}};
-        cout<<uniquePathsWithObstacles(c);
+        vector<int> c = {2,3,6,7};
+        vector<vector<int>> re;
+        re = combinationSum2(c,7);
 
 
         cout<<endl<<"end test...\n";
