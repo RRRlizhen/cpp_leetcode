@@ -17,6 +17,9 @@
 #include <unordered_map>
 #include <map>
 #include <algorithm>
+#include <sstream>
+#include <list>
+#include <stdio.h>
 using namespace std;
 
 class ListNode
@@ -24,7 +27,7 @@ class ListNode
 public:
     int val;
     ListNode *next;
-    ListNode(int x): val(x),next(nullptr) {}
+    ListNode(int x=0): val(x),next(nullptr) {}
 };
 struct RandomListNode{
         int label;
@@ -51,6 +54,84 @@ public:
         return re;
     }
     vector<int> data;
+};
+
+class TrieNode{
+public:
+    ///init
+    TrieNode *vnext[26];
+    int value;
+    TrieNode(){
+        memset(vnext,0,sizeof(nullptr)*26);
+        value = -1;
+    }
+};
+
+class Trie{
+public:
+    TrieNode *root;
+public:
+    Trie(){
+       root = new TrieNode;
+    }
+    ~Trie(){
+        ///
+    }
+
+    ///insert
+    void insert(string s){
+        TrieNode *tnode = root;
+        int i = 0;
+        int n = s.size();
+        while(i<n){
+            if(tnode->vnext[s[i]-'a'] != nullptr){
+                tnode = tnode->vnext[s[i]-'a'];
+                i++;
+            }else{
+                break;
+            }
+        }
+
+        while(i<n){
+            tnode->vnext[s[i]-'a'] = new TrieNode();
+            tnode = tnode->vnext[s[i]-'a'];
+            i = i+1;
+        }
+        tnode->value = 1;
+    }
+
+    ///returns if the word is in the trie
+    bool search(string key){
+        TrieNode *tnode = root;
+        int n = key.size();
+        for(int i = 0;i<n;i++){
+            if(tnode->vnext[key[i]-'a'] == nullptr){
+                return false;
+            }else{
+                tnode = tnode->vnext[key[i]-'a'];
+            }
+        }
+        if(tnode->value > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    ///returns if there is any word in the trie
+    ///that starts with the given prefix
+    bool startsWith(string prefix){
+        TrieNode *tnode = root;
+        int n = prefix.length();
+        for(int i = 0;i<n;i++){
+            if(tnode->vnext[prefix[i]-'a'] ==nullptr){
+                return false;
+            }else{
+                tnode = tnode->vnext[prefix[i] - 'a'];
+            }
+        }
+        return true;
+    }
 };
 
 
@@ -259,7 +340,7 @@ public:
         }
         vector<int> dp(nums.size());
         dp[0] = 1;
-        for(int i = 1;i<nums.size();i++){
+        for(int i = 1;i<(int)nums.size();i++){
             dp[i] = 1;
             for(int j = 0;j<i;j++){
                 if(nums[j] < nums[i]){
@@ -277,7 +358,7 @@ public:
     ///
     void getLIS(vector<int> &nums,vector<int> &dp){
         dp[0] = 1;///dp.size>=1
-        for(int i = 0;i<nums.size();i++){
+        for(int i = 0;i<(int)nums.size();i++){
             dp[i] = 1;
             for(int j = 0;j<i;j++){
                 if(nums[j] < nums[i]){
@@ -292,7 +373,7 @@ public:
         vector<int> dp(nums.size());
         getLIS(nums,dp);
         int m = 0;
-        for(int i = 0;i<dp.size();i++){
+        for(int i = 0;i<(int)dp.size();i++){
             m = dp[i]>dp[m]? i:m;
         }
         re.push_back(nums[m]);
@@ -423,11 +504,11 @@ public:
             return;
         }
 
-        if(i>=c.size()) return ;
+        if(i>=(int)c.size()) return ;
         ///not select the c[i]
         help_combinationSum(c,t,re,path,i+1);
         path.push_back(c[i]);
-        help_combinationSum(c,t,re,path,i);
+        help_combinationSum(c,t,re,path,i+1);
         path.pop_back();
     }
     vector<vector<int>> combinationSum(vector<int>& c, int t) {
@@ -448,26 +529,23 @@ public:
 
 
     ///
-    void help_combinationSum2(vector<int> &c,const int t,vector<vector<int>> &re,vector<int> &path,
-                    int i){
-        int sum = accumulate(path.begin(),path.end(),0);
-        if(t==sum){
-            sort(path.begin(),path.end());
+    void help_c(vector<int> &c,vector<vector<int>> &re,vector<int> &path,int gap,size_t i){
+        if(gap==0){
             re.push_back(path);
-        }
-
-        if(t<sum){
             return;
         }
-        if(i>=c.size()){
-            return;
-        }
-        ///not select c[i]
-        help_combinationSum(c,t,re,path,i+1);
-        path.push_back(c[i]);
-        help_combinationSum2(c,t,re,path,i+1);
-        path.pop_back();
 
+        int prev = -1;
+        for(;i<c.size();i++){
+            if(c[i]==prev){
+                continue;
+            }
+            if(gap<c[i]) return;
+            prev = c[i];
+            path.push_back(c[i]);
+            help_c(c,re,path,gap-c[i],i+1);
+            path.pop_back();
+        }
     }
     vector<vector<int>> combinationSum2(vector<int>& c, int t) {
         vector<vector<int>> re;
@@ -475,7 +553,7 @@ public:
         sort(c.begin(),c.end());
 
         if(c.empty()) return re;
-        help_combinationSum2(c,t,re,path,0);
+        help_c(c,re,path,t,0);
         for(auto i:re){
             for(auto j:i){
                 cout<<j<<" ";
@@ -483,16 +561,278 @@ public:
         }
         return re;
     }
+
+    ///
+    void help_g(const int n,string &path,vector<string> &re,
+                   int l,int r){
+        if(l==n){
+            string s(path);
+            re.push_back(s.append(n-r,')'));
+            return;
+        }
+
+        path.push_back('(');
+        help_g(n,path,re,l+1,r);
+        path.pop_back();
+
+        if(r<l){
+            path.push_back(')');
+            help_g(n,path,re,l,r+1);
+            path.pop_back();
+        }
+    }
+    vector<string> generateParenthesis(int n) {
+        vector<string> re;
+        string path;
+        if(n>0) help_g(n,path,re,0,0);
+        for(auto i:re){
+            cout<<i<<"\n";
+        }
+        return re;
+    }
+
+
+    ///
+    void help_res(string s,vector<string> &re,vector<string> &path,size_t start){
+        if(path.size() == 4 && start ==s.size()){
+            ///find a solution
+            re.push_back(path[0]+'.'+path[1]+'.'+path[2]+'.'+path[3]);
+            return;
+        }
+        if(s.size() - start > (4-path.size())*3){
+            return ;///s:xxxsss sss sss sss
+                    ///p:p0,
+        }
+        if(s.size() - start < (4-path.size())){
+            return;
+        }
+
+        int num = 0;
+        for(size_t i = start;i<start+3;i++){
+            num = num*10+(s[i]-'0');
+
+            if(num<0 || num>255) continue;
+            path.push_back(s.substr(start,i-start+1));
+            help_res(s,re,path,i+1);
+            path.pop_back();
+
+            if(num==0) break;///don't have 012.12.12.12 , but have 0.0.0.0
+        }
+    }
+    vector<string> restoreIpAddresses(string s) {
+        vector<string> re;
+        vector<string> path;/// store the immediate result
+        help_res(s,re,path,0);
+        for(auto i: re){
+            cout<<i<<"\n";
+        }
+        return re;
+    }
+
+
+    ///
+    bool isPalindrome(int x) {
+        if(x==0) return true;
+
+        string str;
+        ostringstream os;
+        if(os << x){
+            str = os.str();
+        }
+        int r = str.size()-1;
+        int l = 0;
+        while(l<r){
+            if(str[l++]==str[r--]){
+                continue;
+            }else{
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    ///
+    void help_partition(string s,vector<vector<string>> &re,vector<string> &path,int start){
+        if(start==(int)s.size()){
+            re.push_back(path);
+            return;
+        }
+        for(int i = start;i<(int)s.size();i++){
+            if(is_palindrome(s,start,i)){
+                string t = s.substr(start,i-start+1);
+                path.push_back(t);
+                help_partition(s,re,path,i+1);
+                path.pop_back();
+            }
+        }
+    }
+    vector<vector<string>> _partition(string s){
+        vector<vector<string>> re;
+        vector<string> path;
+        if(!s.empty()){
+            help_partition(s,re,path,0);
+        }
+        for(auto i:re){
+            for(auto j: i){
+                cout<<j<<" ";
+            }cout<<"\n";
+        }
+        return re;
+    }
+
+
+
+    ///
+    bool is_palindrome(string &s,int l,int r){
+        while(l<r){
+            if(s[l++]==s[r--]){
+                continue;
+            }else{
+                return false;
+            }
+        }
+        return true;
+    }
+    int minCut(string s) {
+        /**
+            dp[i] = min{dp[j+1]+1, i<=j && j<n && s[i,j] is a palindrome }
+        */
+        if(s.empty()) return 0;
+        int n = s.size();
+        int dp[n+1];
+        bool pa[n][n];
+        memset(pa,0,sizeof(pa));
+        memset(dp,false,sizeof(dp));
+
+        dp[n] = -1;
+        for(int i=n-1;i>=0;i--){
+            dp[i] = INT_MAX;
+            for(int j = i;j<n;j++){
+                if(s[i]==s[j] && ((j-i<2) || pa[i+1][j-1])){
+                    pa[i][j] = true;
+                    dp[i] = min(dp[i],dp[j+1]+1);
+                }
+            }
+        }///for-for
+        return dp[0];
+    }
+
+    void test_memset(){
+        ///============
+        int *d;
+        d = new int[10];
+        memset(d,-1,sizeof(int)*10);
+        for(int i = 0;i<10;i++){
+            cout<<d[i]<<" ";
+        }cout<<endl;
+        delete[] d;
+        ///==============
+        int **a;
+        a = new int*[10];
+        for(int i = 0;i<10;i++){
+            a[i] = new int[5];
+            memset(a[i],-1,sizeof(int)*5);
+        }
+        for(int i = 0;i<10;i++){
+            for(int j = 0;j<5;j++){
+                cout<<a[i][j]<<" ";
+            }cout<<endl;
+        }
+        for(int i = 0;i<10;i++){
+            delete[] a[i];
+        }
+        delete[] a;
+
+        ///====================
+        int ***c;
+        c = new int**[10];
+        for(int i = 0;i<10;i++){
+           c[i] = new int*[7];
+           for(int j = 0;j<7;j++){
+             c[i][j] = new int[5];
+             memset(c[i][j],-1,sizeof(int)*5);
+           }
+        }
+
+        for(int i = 0;i<10;i++){
+            for(int j = 0;j<7;j++){
+                for(int k = 0;k<5;k++){
+                    cout<<"i-j-k"<<i<<j<<k<<"~"<<c[i][j][k]<<" ";
+                }cout<<endl;
+            }cout<<endl<<endl;
+        }
+        ///===========
+
+        for(int i = 0;i<10;i++){
+            for(int j = 0;j<7;j++){
+                delete[] c[i][j];
+            }
+            delete[] c[i];
+        }
+        delete[] c;
+        cout<<"destoryed done!"<<endl;
+    }
+
+
+    vector<int> majorityElement(vector<int>& nums) {
+        int n = nums.size();
+        unordered_map<int,int> candTimes;
+        vector<int> re;
+        for(int i = 0;i<n;i++){
+           if(candTimes.find(nums[i])!=candTimes.end()){
+                candTimes[nums[i]]++;
+           }else{
+                if(candTimes.size()<3){
+                    candTimes[nums[i]]++;
+                }else if(candTimes.size()==3){
+                    for(unordered_map<int,int>::iterator mit = candTimes.begin();
+                        mit!=candTimes.end();mit++){
+                        if(mit->second==1){
+                            candTimes.erase(mit);
+                        }else{
+                            mit->second--;
+                        }
+                    }
+                }
+           }///if-else
+        }///for
+
+        ///verify the solution
+        for(unordered_map<int,int>::iterator mit = candTimes.begin();
+            mit!=candTimes.end();mit++){
+            mit->second = 0;
+        }
+
+        for(int i = 0;i<n;i++){
+            if(candTimes.find(nums[i])!=candTimes.end()){
+                candTimes[nums[i]]++;
+            }
+        }
+
+
+        for(unordered_map<int,int>::iterator mit = candTimes.begin();
+            mit!=candTimes.end();mit++){
+            if(mit->second>(n/3)){
+                re.push_back(mit->first);
+            }
+        }
+        return re;
+    }
+
     void test(ListNode *head){
         cout<<"begin test...\n";
         ListNode n1(6),n2(2),n3(4),n4(3),n5(5),n6(1);
         n1.next = &n2;n2.next = &n3;n3.next = &n4;n4.next = &n5;n5.next = &n6;
-        ListNode *head2 = &n1;
-        showList(head2);cout<<endl;
-        vector<int> c = {2,3,6,7};
-        vector<vector<int>> re;
-        re = combinationSum2(c,7);
-
+        //ListNode *head2 = &n1;
+        //vector<int> c = {1,2,0,4,5,0,6,7,8,9,9,9,9,9,9,0,0,0,0,0};
+        vector<int> c = {1,1,1,3,3,2,2,2};
+        cout<<"c.size()="<<c.size()<<endl;
+        vector<int> re;
+        re = majorityElement(c);
+        for(auto i:re){
+            cout<<i<<" ";
+        }cout<<endl;
 
         cout<<endl<<"end test...\n";
     }

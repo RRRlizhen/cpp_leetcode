@@ -35,12 +35,12 @@
 #include<sstream>
 #include<stdio.h>
 //#include "../sort.h"
-#include "getLeastNumber.h"
+//#include "getLeastNumber.h"
 #include<set>
+#include "bfs.h"
 using namespace std;
 int main() {
-    Offer s;
-    int data[] ={1,-2,3,10,-4,7,2,-5};
-    cout<<s.findGreatestSumOfSubArray(data,sizeof(data)/sizeof(data[0]));
+    BFS bfs;
+    bfs.test();
     return 0;
 }
