@@ -148,8 +148,57 @@ public:
 
 	//mirros 非递归
 	//前序遍历 mirros 非递归
+	void preMorris(TreeNode* root){
+        TreeNode *curr = root;
+        TreeNode *prev = nullptr;
+        while(curr!=nullptr){
+            if(curr->left==nullptr){
+                cout<<curr->val<<" ";
+                curr = curr->right;
+            }else{
+                prev = curr->left;
+                while(prev->right!=nullptr && prev->right!=curr){
+                    prev = prev->right;
+                }
+                if(prev->right==nullptr){
+                    prev->right = curr;
+                    cout<<curr->val<<" ";
+                    curr = curr->left;
+                }else{
+                    prev->right = curr;
+                    curr = curr->right;
+                }
+            }
+        }///while
+    }
 	//中序遍历 mirros 非递归
-	//后序遍历 mirros 非递归
+	///inorderMorrisTraversal
+    void inorderMorrisTraversal(TreeNode *root){
+        TreeNode *curr = root;
+        TreeNode *prev = nullptr;
+        while(curr!=nullptr){
+            if(curr->left == nullptr){
+                cout<<curr->val<<" ";
+                curr = curr->right;
+            }else{
+                ///search predecessor
+                prev = curr->left;
+                while(prev->right !=nullptr && prev->right!=curr){
+                    prev = prev->right;
+                }
+                if(prev->right==nullptr){
+                    prev->right = curr;
+                    curr = curr->left;
+                }else{
+                    prev->right = nullptr;///recover the tree
+                    cout<<curr->val<<" ";
+                    curr = curr->right;
+                }
+            }///if-else
+        }///while
+    }
+
+    //后序遍历 mirros 非递归
 };
 
 #endif /* TREETRANS01_H_ */

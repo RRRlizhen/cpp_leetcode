@@ -37,10 +37,10 @@
 //#include "../sort.h"
 //#include "getLeastNumber.h"
 #include<set>
-#include "bfs.h"
+#include "matrix.h"
 using namespace std;
 int main() {
-    BFS bfs;
+    A bfs;
     bfs.test();
     return 0;
 }
